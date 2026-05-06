@@ -1,0 +1,27 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.input {
+  @apply w-full border border-gray-300 px-3 py-2 rounded-lg 
+         focus:outline-none focus:ring-2 focus:ring-blue-400 
+         focus:border-transparent transition;
+}
+
+.card {
+  @apply bg-white shadow-lg rounded-xl p-6;
+}
+
+.btn-primary {
+  @apply bg-gradient-to-r from-blue-500 to-indigo-500 
+         text-white py-2 rounded-lg hover:scale-105 
+         transition transform;
+}
+
+.btn-danger {
+  @apply bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600;
+}
+
+.btn-edit {
+  @apply bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600;
+}
