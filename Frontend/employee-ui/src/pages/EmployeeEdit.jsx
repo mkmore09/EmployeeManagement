@@ -98,10 +98,25 @@ export default function EmployeeEdit() {
       const res = await updateEmployee(payload);
 
       if (!res?.success) {
-        setApiMessage(res.message);
-        setIsSuccess(false);
-        return;
-      }
+
+  // ================= BACKEND FIELD ERROR =================
+  if (res.field) {
+
+    setErrors(prev => ({
+      ...prev,
+      [res.field]: res.message
+    }));
+
+  } else {
+
+    // general error
+    setApiMessage(res?.message || "Creation failed");
+
+  }
+
+  setIsSuccess(false);
+  return;
+}
 
       setApiMessage(res.message || "Updated successfully");
       setIsSuccess(true);
@@ -116,15 +131,7 @@ export default function EmployeeEdit() {
 
   return (
     <>
-      {apiMessage && (
-        <div
-          className={`p-2 mb-3 ${
-            isSuccess ? "bg-green-100" : "bg-red-100"
-          }`}
-        >
-          {apiMessage}
-        </div>
-      )}
+      
 
       <EmployeeForm
         form={form}

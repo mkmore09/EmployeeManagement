@@ -91,7 +91,22 @@ export default function EmployeeCreate() {
       // API RESPONSE HANDLING
       // =====================
       if (!res?.success) {
-        setApiMessage(res?.message || "Creation failed");
+
+  // ================= BACKEND FIELD ERROR =================
+        if (res.field) {
+
+          setErrors(prev => ({
+            ...prev,
+            [res.field]: res.message
+          }));
+
+        } else {
+
+          // general error
+          setApiMessage(res?.message || "Creation failed");
+
+        }
+
         setIsSuccess(false);
         return;
       }

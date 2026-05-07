@@ -70,11 +70,23 @@ namespace EmployeeMaster.src.Application.Services
         private ApiResponse ParseResponse(DataTable dt)
         {
             if (dt.Rows.Count == 0)
-                return new ApiResponse { Success = false, Message = "No response from DB" };
+            {
+                return new ApiResponse
+                {
+                    Success = false,
+                    Field = "server",
+                    Message = "No response from DB"
+                };
+            }
 
             return new ApiResponse
             {
                 Success = Convert.ToInt32(dt.Rows[0]["success"]) == 1,
+
+                Field = dt.Columns.Contains("field")
+                    ? dt.Rows[0]["field"]?.ToString() ?? ""
+                    : "",
+
                 Message = dt.Rows[0]["message"]?.ToString() ?? ""
             };
         }

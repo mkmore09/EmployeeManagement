@@ -24,44 +24,121 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
-    IF EXISTS (SELECT 1 FROM EmployeeMaster WHERE EmailAddress = @EmailAddress)
-        SELECT 0 success, 'Email already exists' message;
-    ELSE IF EXISTS (SELECT 1 FROM EmployeeMaster WHERE MobileNumber = @MobileNumber)
-        SELECT 0 success, 'Mobile already exists'message;
-    ELSE IF EXISTS (SELECT 1 FROM EmployeeMaster WHERE PanNumber = @PanNumber)
-        SELECT 0 success, 'PAN already exists' message;
-    ELSE IF EXISTS (SELECT 1 FROM EmployeeMaster WHERE PassportNumber = @PassportNumber)
-        SELECT 0 success, 'Passport already exists' message;
-    ELSE
+    -- ================= DUPLICATE CHECKS =================
+
+    IF EXISTS (
+        SELECT 1 
+        FROM EmployeeMaster 
+        WHERE EmailAddress = @EmailAddress
+    )
     BEGIN
-        DECLARE @NextId INT = ISNULL((SELECT MAX(Row_Id) FROM EmployeeMaster),0) + 1;
-        DECLARE @Code VARCHAR(10) = RIGHT('000' + CAST(@NextId AS VARCHAR),3);
-
-        INSERT INTO EmployeeMaster
-        (
-            EmployeeCode, FirstName, LastName,
-            CountryId, StateId, CityId,
-            EmailAddress, MobileNumber, PanNumber, PassportNumber,
-            ProfileImage, Gender,
-            DateOfBirth, DateOfJoinee,
-            CreatedDate, IsActive, IsDeleted
-        )
-        VALUES
-        (
-            @Code, @FirstName, @LastName,
-            @CountryId, @StateId, @CityId,
-            @EmailAddress, @MobileNumber, UPPER(@PanNumber), UPPER(@PassportNumber),
-            @ProfileImage, @Gender,
-            @DateOfBirth, @DateOfJoinee,
-            GETDATE(), 1, 0
-        );
-
         SELECT 
-    1 AS success, 
-    'Employee created successfully' AS message;
+            0 AS success,
+            'email' AS field,
+            'Email already exists' AS message;
+
+        RETURN;
     END
-END
+
+    IF EXISTS (
+        SELECT 1 
+        FROM EmployeeMaster 
+        WHERE MobileNumber = @MobileNumber
+    )
+    BEGIN
+        SELECT 
+            0 AS success,
+            'mobile' AS field,
+            'Mobile already exists' AS message;
+
+        RETURN;
+    END
+
+    IF EXISTS (
+        SELECT 1 
+        FROM EmployeeMaster 
+        WHERE PanNumber = @PanNumber
+    )
+    BEGIN
+        SELECT 
+            0 AS success,
+            'pan' AS field,
+            'PAN already exists' AS message;
+
+        RETURN;
+    END
+
+    IF EXISTS (
+        SELECT 1 
+        FROM EmployeeMaster 
+        WHERE PassportNumber = @PassportNumber
+    )
+    BEGIN
+        SELECT 
+            0 AS success,
+            'passport' AS field,
+            'Passport already exists' AS message;
+
+        RETURN;
+    END
+
+    -- ================= INSERT =================
+
+    DECLARE @NextId INT =
+        ISNULL((SELECT MAX(Row_Id) FROM EmployeeMaster), 0) + 1;
+
+    DECLARE @Code VARCHAR(10) =
+        RIGHT('000' + CAST(@NextId AS VARCHAR), 3);
+
+    INSERT INTO EmployeeMaster
+    (
+        EmployeeCode,
+        FirstName,
+        LastName,
+        CountryId,
+        StateId,
+        CityId,
+        EmailAddress,
+        MobileNumber,
+        PanNumber,
+        PassportNumber,
+        ProfileImage,
+        Gender,
+        DateOfBirth,
+        DateOfJoinee,
+        CreatedDate,
+        IsActive,
+        IsDeleted
+    )
+    VALUES
+    (
+        @Code,
+        @FirstName,
+        @LastName,
+        @CountryId,
+        @StateId,
+        @CityId,
+        @EmailAddress,
+        @MobileNumber,
+        UPPER(@PanNumber),
+        UPPER(@PassportNumber),
+        @ProfileImage,
+        @Gender,
+        @DateOfBirth,
+        @DateOfJoinee,
+        GETDATE(),
+        1,
+        0
+    );
+
+    SELECT 
+        1 AS success,
+        '' AS field,
+        'Employee created successfully' AS message;
+
+END;
 GO
+
 
 -- =============================================
 -- Update Employee
@@ -87,40 +164,99 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
-    IF EXISTS (SELECT 1 FROM EmployeeMaster WHERE EmailAddress=@EmailAddress AND Row_Id<>@Row_Id)
-        SELECT 0 success,'Email already exists' message;
-    ELSE IF EXISTS (SELECT 1 FROM EmployeeMaster WHERE PanNumber=@PanNumber AND Row_Id<>@Row_Id)
-        SELECT 0 success,'PAN already exists' message;
-    ELSE IF EXISTS (SELECT 1 FROM EmployeeMaster WHERE PassportNumber=@PassportNumber AND Row_Id<>@Row_Id)
-        SELECT 0 success,'Passport already exists' message;
-    ELSE
-    BEGIN
-        UPDATE EmployeeMaster
-        SET FirstName=@FirstName,
-            LastName=@LastName,
-            CountryId=@CountryId,
-            StateId=@StateId,
-            CityId=@CityId,
-            EmailAddress=@EmailAddress,
-            MobileNumber=@MobileNumber,
-            PanNumber=UPPER(@PanNumber),
-            PassportNumber=UPPER(@PassportNumber),
-            Gender=@Gender,
-            DateOfBirth=@DateOfBirth,
-            DateOfJoinee=@DateOfJoinee,
-            UpdatedDate=GETDATE()
-        WHERE Row_Id=@Row_Id;
+    -- ================= DUPLICATE CHECKS =================
 
+    IF EXISTS (
+        SELECT 1 
+        FROM EmployeeMaster 
+        WHERE EmailAddress = @EmailAddress
+        AND Row_Id <> @Row_Id
+    )
+    BEGIN
         SELECT 
-    1 AS success, 
-    'Employee created successfully' AS message;
+            0 AS success,
+            'email' AS field,
+            'Email already exists' AS message;
+
+        RETURN;
     END
-END
+
+    IF EXISTS (
+        SELECT 1 
+        FROM EmployeeMaster 
+        WHERE MobileNumber = @MobileNumber
+        AND Row_Id <> @Row_Id
+    )
+    BEGIN
+        SELECT 
+            0 AS success,
+            'mobile' AS field,
+            'Mobile already exists' AS message;
+
+        RETURN;
+    END
+
+    IF EXISTS (
+        SELECT 1 
+        FROM EmployeeMaster 
+        WHERE PanNumber = @PanNumber
+        AND Row_Id <> @Row_Id
+    )
+    BEGIN
+        SELECT 
+            0 AS success,
+            'pan' AS field,
+            'PAN already exists' AS message;
+
+        RETURN;
+    END
+
+    IF EXISTS (
+        SELECT 1 
+        FROM EmployeeMaster 
+        WHERE PassportNumber = @PassportNumber
+        AND Row_Id <> @Row_Id
+    )
+    BEGIN
+        SELECT 
+            0 AS success,
+            'passport' AS field,
+            'Passport already exists' AS message;
+
+        RETURN;
+    END
+
+    -- ================= UPDATE =================
+
+    UPDATE EmployeeMaster
+    SET
+        FirstName = @FirstName,
+        LastName = @LastName,
+        CountryId = @CountryId,
+        StateId = @StateId,
+        CityId = @CityId,
+        EmailAddress = @EmailAddress,
+        MobileNumber = @MobileNumber,
+        PanNumber = UPPER(@PanNumber),
+        PassportNumber = UPPER(@PassportNumber),
+        ProfileImage = @ProfileImage,
+        Gender = @Gender,
+        DateOfBirth = @DateOfBirth,
+        DateOfJoinee = @DateOfJoinee,
+        UpdatedDate = GETDATE()
+    WHERE Row_Id = @Row_Id;
+
+    SELECT 
+        1 AS success,
+        '' AS field,
+        'Employee updated successfully' AS message;
+
+END;
 GO
 
 
 -- =============================================
--- Get Employees (NO CHANGE)
+-- Get Employees Paged
 -- =============================================
 CREATE OR ALTER PROCEDURE stp_Emp_GetEmployeesPaged
 (
@@ -130,17 +266,27 @@ CREATE OR ALTER PROCEDURE stp_Emp_GetEmployeesPaged
 )
 AS
 BEGIN
+    SET NOCOUNT ON;
+
     SELECT 
         e.*,
         c.CountryName,
         s.StateName,
         ci.CityName
     FROM EmployeeMaster e
-    LEFT JOIN Country c ON e.CountryId = c.Row_Id
-    LEFT JOIN State s ON e.StateId = s.Row_Id
-    LEFT JOIN City ci ON e.CityId = ci.Row_Id
+    LEFT JOIN Country c 
+        ON e.CountryId = c.Row_Id
+    LEFT JOIN State s 
+        ON e.StateId = s.Row_Id
+    LEFT JOIN City ci 
+        ON e.CityId = ci.Row_Id
     WHERE e.IsDeleted = 0
-      AND (@Search IS NULL OR e.FirstName LIKE '%' + @Search + '%')
+    AND (
+        @Search IS NULL
+        OR e.FirstName LIKE '%' + @Search + '%'
+        OR e.LastName LIKE '%' + @Search + '%'
+        OR e.EmailAddress LIKE '%' + @Search + '%'
+    )
     ORDER BY e.Row_Id DESC
     OFFSET (@PageNumber - 1) * @PageSize ROWS
     FETCH NEXT @PageSize ROWS ONLY;
@@ -149,7 +295,7 @@ GO
 
 
 -- =============================================
--- Get Employee By Id (NO CHANGE)
+-- Get Employee By Id
 -- =============================================
 CREATE OR ALTER PROCEDURE stp_Emp_GetById
 (
@@ -157,7 +303,12 @@ CREATE OR ALTER PROCEDURE stp_Emp_GetById
 )
 AS
 BEGIN
-    SELECT * FROM EmployeeMaster WHERE Row_Id = @Row_Id;
+    SET NOCOUNT ON;
+
+    SELECT *
+    FROM EmployeeMaster
+    WHERE Row_Id = @Row_Id
+    AND IsDeleted = 0;
 END;
 GO
 
@@ -176,28 +327,42 @@ BEGIN
     BEGIN TRY
 
         UPDATE EmployeeMaster
-        SET IsDeleted = 1,
+        SET
+            IsDeleted = 1,
             DeletedDate = GETDATE()
         WHERE Row_Id = @Row_Id;
 
         IF @@ROWCOUNT = 0
         BEGIN
-            SELECT 0 AS success, 'Employee not found' AS message;
+            SELECT
+                0 AS success,
+                'id' AS field,
+                'Employee not found' AS message;
+
             RETURN;
         END
 
-        SELECT 1 AS success, 'Employee deleted successfully' AS message;
+        SELECT
+            1 AS success,
+            '' AS field,
+            'Employee deleted successfully' AS message;
 
     END TRY
+
     BEGIN CATCH
-        SELECT 0 AS success, ERROR_MESSAGE() AS message;
+
+        SELECT
+            0 AS success,
+            'server' AS field,
+            ERROR_MESSAGE() AS message;
+
     END CATCH
 END;
 GO
 
 
 -- =============================================
--- Duplicate Check (KEEP AS IS)
+-- Duplicate Check
 -- =============================================
 CREATE OR ALTER PROCEDURE stp_Emp_CheckDuplicate
 (
@@ -208,46 +373,121 @@ CREATE OR ALTER PROCEDURE stp_Emp_CheckDuplicate
 )
 AS
 BEGIN
-    IF EXISTS (SELECT 1 FROM EmployeeMaster WHERE EmailAddress = @Email)
-        SELECT 'EmailExists' AS Result
-    ELSE IF EXISTS (SELECT 1 FROM EmployeeMaster WHERE MobileNumber = @Mobile)
-        SELECT 'MobileExists' AS Result
-    ELSE IF EXISTS (SELECT 1 FROM EmployeeMaster WHERE PanNumber = @Pan)
-        SELECT 'PanExists' AS Result
-    ELSE IF EXISTS (SELECT 1 FROM EmployeeMaster WHERE PassportNumber = @Passport)
-        SELECT 'PassportExists' AS Result
-    ELSE
-        SELECT 'OK'
+    SET NOCOUNT ON;
+
+    IF EXISTS (
+        SELECT 1 
+        FROM EmployeeMaster 
+        WHERE EmailAddress = @Email
+    )
+    BEGIN
+        SELECT
+            0 AS success,
+            'email' AS field,
+            'Email already exists' AS message;
+
+        RETURN;
+    END
+
+    IF EXISTS (
+        SELECT 1 
+        FROM EmployeeMaster 
+        WHERE MobileNumber = @Mobile
+    )
+    BEGIN
+        SELECT
+            0 AS success,
+            'mobile' AS field,
+            'Mobile already exists' AS message;
+
+        RETURN;
+    END
+
+    IF EXISTS (
+        SELECT 1 
+        FROM EmployeeMaster 
+        WHERE PanNumber = @Pan
+    )
+    BEGIN
+        SELECT
+            0 AS success,
+            'pan' AS field,
+            'PAN already exists' AS message;
+
+        RETURN;
+    END
+
+    IF EXISTS (
+        SELECT 1 
+        FROM EmployeeMaster 
+        WHERE PassportNumber = @Passport
+    )
+    BEGIN
+        SELECT
+            0 AS success,
+            'passport' AS field,
+            'Passport already exists' AS message;
+
+        RETURN;
+    END
+
+    SELECT
+        1 AS success,
+        '' AS field,
+        'No duplicate found' AS message;
+
 END;
 GO
 
 
 -- =============================================
--- Dropdown APIs (NO CHANGE)
+-- Get Countries
 -- =============================================
 CREATE OR ALTER PROCEDURE stp_Emp_GetCountries
 AS
 BEGIN
-    SELECT * FROM Country;
+    SET NOCOUNT ON;
+
+    SELECT *
+    FROM Country
+    ORDER BY CountryName;
 END;
 GO
 
+
+-- =============================================
+-- Get States By Country
+-- =============================================
 CREATE OR ALTER PROCEDURE stp_Emp_GetStatesByCountry
 (
     @CountryId INT
 )
 AS
 BEGIN
-    SELECT * FROM State WHERE CountryId = @CountryId;
+    SET NOCOUNT ON;
+
+    SELECT *
+    FROM State
+    WHERE CountryId = @CountryId
+    ORDER BY StateName;
 END;
 GO
 
+
+-- =============================================
+-- Get Cities By State
+-- =============================================
 CREATE OR ALTER PROCEDURE stp_Emp_GetCitiesByState
 (
     @StateId INT
 )
 AS
 BEGIN
-    SELECT * FROM City WHERE StateId = @StateId;
+    SET NOCOUNT ON;
+
+    SELECT *
+    FROM City
+    WHERE StateId = @StateId
+    ORDER BY CityName;
 END;
 GO
