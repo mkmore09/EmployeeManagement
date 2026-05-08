@@ -18,7 +18,8 @@ CREATE OR ALTER PROCEDURE stp_Emp_InsertEmployee
     @ProfileImage NVARCHAR(200),
     @Gender TINYINT,
     @DateOfBirth DATE,
-    @DateOfJoinee DATE
+    @DateOfJoinee DATE,
+    @IsActive BIT
 )
 AS
 BEGIN
@@ -127,7 +128,7 @@ BEGIN
         @DateOfBirth,
         @DateOfJoinee,
         GETDATE(),
-        1,
+        @IsActive,
         0
     );
 
@@ -158,7 +159,8 @@ CREATE OR ALTER PROCEDURE stp_Emp_UpdateEmployee
     @ProfileImage NVARCHAR(200),
     @Gender TINYINT,
     @DateOfBirth DATE,
-    @DateOfJoinee DATE
+    @DateOfJoinee DATE,
+    @IsActive BIT
 )
 AS
 BEGIN
@@ -243,7 +245,8 @@ BEGIN
         Gender = @Gender,
         DateOfBirth = @DateOfBirth,
         DateOfJoinee = @DateOfJoinee,
-        UpdatedDate = GETDATE()
+        UpdatedDate = GETDATE(),
+        IsActive= @IsActive
     WHERE Row_Id = @Row_Id;
 
     SELECT 
@@ -280,13 +283,13 @@ BEGIN
         ON e.StateId = s.Row_Id
     LEFT JOIN City ci 
         ON e.CityId = ci.Row_Id
-    WHERE e.IsDeleted = 0
     AND (
         @Search IS NULL
         OR e.FirstName LIKE '%' + @Search + '%'
         OR e.LastName LIKE '%' + @Search + '%'
         OR e.EmailAddress LIKE '%' + @Search + '%'
     )
+    WHERE e.IsDeleted=0
     ORDER BY e.Row_Id DESC
     OFFSET (@PageNumber - 1) * @PageSize ROWS
     FETCH NEXT @PageSize ROWS ONLY;

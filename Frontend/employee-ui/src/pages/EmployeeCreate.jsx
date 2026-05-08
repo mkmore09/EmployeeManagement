@@ -1,33 +1,34 @@
 import React, { useState } from "react";
 import EmployeeForm from "../components/EmployeeForm";
 import { createEmployee } from "../api/employeeApi";
+import { useNavigate } from "react-router-dom";
+// =====================
+// INITIAL STATE
+// =====================
+const initialForm = {
+  firstName: "",
+  lastName: "",
+  email: "",
+  mobile: "",
+  pan: "",
+  passport: "",
+  dob: "",
+  doj: "",
+  countryId: "",
+  stateId: "",
+  cityId: "",
+  gender: "",
+  isActive: false,
+};
 
 export default function EmployeeCreate() {
-
-  const [form, setForm] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    mobile: "",
-    pan: "",
-    passport: "",
-    dob: "",
-    doj: "",
-    countryId: "",
-    stateId: "",
-    cityId: "",
-    gender: "",
-    isActive: false,
-  });
-
+  const navigate = useNavigate();
+  const [form, setForm] = useState(initialForm);
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
 
-  const [apiMessage, setApiMessage] = useState("");
-  const [isSuccess, setIsSuccess] = useState(false);
-
   // =====================
-  // VALIDATION
+  // FRONTEND VALIDATION
   // =====================
   const validate = () => {
     const err = {};
@@ -51,22 +52,19 @@ export default function EmployeeCreate() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const err = validate();
-    if (Object.keys(err).length) {
-      setErrors(err);
+    const frontendErrors = validate();
+
+    if (Object.keys(frontendErrors).length > 0) {
+      setErrors(frontendErrors);
       return;
     }
 
     setLoading(true);
-    setApiMessage("");
 
     try {
-
-      // 🔥 FIXED PAYLOAD (IMPORTANT)
       const payload = {
         firstName: form.firstName.trim(),
         lastName: form.lastName?.trim(),
-
         email: form.email,
         mobile: form.mobile,
         pan: form.pan,
@@ -78,83 +76,57 @@ export default function EmployeeCreate() {
 
         gender: form.gender === "Male" ? 1 : 2,
 
-        // ✅ CRITICAL FIX (SQL DATE SAFE)
         DateOfBirth: form.dob ? new Date(form.dob).toISOString() : null,
         DateOfJoinee: form.doj ? new Date(form.doj).toISOString() : null,
 
-        isActive: form.isActive
+        isActive: form.isActive,
       };
 
       const res = await createEmployee(payload);
 
       // =====================
-      // API RESPONSE HANDLING
+      // BACKEND VALIDATION ERROR
       // =====================
       if (!res?.success) {
+        if (res?.field && res?.message) {
+          const field = res.field.toLowerCase();
 
-  // ================= BACKEND FIELD ERROR =================
-        if (res.field) {
-
-          setErrors(prev => ({
+          setErrors((prev) => ({
             ...prev,
-            [res.field]: res.message
+            [field]: res.message,
           }));
-
         } else {
-
-          // general error
-          setApiMessage(res?.message || "Creation failed");
-
+          setErrors({
+            form: res?.message || "Something went wrong",
+          });
         }
-
-        setIsSuccess(false);
         return;
       }
 
-      setApiMessage(res.message || "Employee created successfully");
-      setIsSuccess(true);
-
-      // reset form
-      setForm({
-        firstName: "",
-        lastName: "",
-        email: "",
-        mobile: "",
-        pan: "",
-        passport: "",
-        dob: "",
-        doj: "",
-        countryId: "",
-        stateId: "",
-        cityId: "",
-        gender: "",
-        isActive: false,
-      });
-
+      // =====================
+      // SUCCESS RESET
+      // =====================
+      setForm(initialForm);
+      setErrors({});
+      navigate("/");
     } catch (err) {
-      setApiMessage(
-        err?.response?.data?.message ||
-        err?.message ||
-        "Server error"
-      );
-      setIsSuccess(false);
+      setErrors({
+        form:
+          err?.response?.data?.message ||
+          err?.message ||
+          "Server error",
+      });
     } finally {
       setLoading(false);
     }
   };
 
-  // =====================
-  // UI
-  // =====================
   return (
     <>
-      {apiMessage && (
-        <div
-          className={`p-2 mb-3 rounded ${
-            isSuccess ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"
-          }`}
-        >
-          {apiMessage}
+      {/* Global error */}
+      {errors.form && (
+        <div className="bg-red-100 text-red-700 p-2 mb-3 rounded">
+          {errors.form}
         </div>
       )}
 

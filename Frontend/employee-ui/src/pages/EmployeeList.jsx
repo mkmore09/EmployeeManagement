@@ -139,34 +139,132 @@ export default function EmployeeList() {
                     >
                       <button
                         onClick={() => handleEdit(emp)}
-                        className="bg-blue-500 text-white px-3 py-1 rounded text-xs"
+                         disabled={emp.IsDeleted}
+                        className={`px-3 py-1 rounded text-xs text-white ${
+                        emp.IsDeleted
+                          ? "bg-gray-400 cursor-not-allowed"
+                          : "bg-red-500 hover:bg-red-600"
+                      }`}
                       >
                         Edit
                       </button>
 
-                      <button
-                        onClick={() => handleDelete(emp.Row_Id)}
-                        className="bg-red-500 text-white px-3 py-1 rounded text-xs"
-                      >
-                        Delete
-                      </button>
+                    <button
+                      onClick={() => handleDelete(emp.Row_Id)}
+                      disabled={emp.IsDeleted}
+                      className={`px-3 py-1 rounded text-xs text-white ${
+                        emp.IsDeleted
+                          ? "bg-gray-400 cursor-not-allowed"
+                          : "bg-red-500 hover:bg-red-600"
+                      }`}
+                    >
+                      Delete
+                    </button>
                     </td>
                   </tr>
 
                   {expandedRow === emp.Row_Id && (
-                    <tr className="bg-gray-50">
-                      <td colSpan="6" className="p-4">
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                          <div><b>ID:</b> {emp.Row_Id}</div>
-                          <div><b>Code:</b> {emp.EmployeeCode}</div>
-                          <div><b>PAN:</b> {emp.PanNumber}</div>
-                          <div><b>Passport:</b> {emp.PassportNumber}</div>
-                          <div><b>Country:</b> {emp.CountryName}</div>
-                          <div><b>State:</b> {emp.StateName}</div>
-                          <div><b>City:</b> {emp.CityName}</div>
-                        </div>
-                      </td>
-                    </tr>
+                  <tr className="bg-gray-50">
+                  <td colSpan="6" className="p-4">
+
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+
+                  <div>
+                  <b>ID:</b> {emp.Row_Id}
+                  </div>
+
+                  <div>
+                  <b>Employee Code:</b> {emp.EmployeeCode}
+                  </div>
+
+                  <div>
+                  <b>First Name:</b> {emp.FirstName}
+                  </div>
+
+                  <div>
+                  <b>Last Name:</b> {emp.LastName}
+                  </div>
+
+                  <div>
+                  <b>Email:</b> {emp.EmailAddress}
+                  </div>
+
+                  <div>
+                  <b>Mobile:</b> {emp.MobileNumber}
+                  </div>
+
+                  <div>
+                  <b>PAN:</b> {emp.PanNumber}
+                  </div>
+
+                  <div>
+                  <b>Passport:</b> {emp.PassportNumber}
+                  </div>
+
+                  <div>
+                  <b>Gender:</b>{" "}
+                  {emp.Gender === 1 ? "Male" : "Female"}
+                  </div>
+
+                  <div>
+                  <b>Status:</b>{" "}
+                  {emp.IsActive ? "Active" : "Inactive"}
+                  </div>
+
+                  <div>
+                  <b>Country:</b> {emp.CountryName}
+                  </div>
+
+                  <div>
+                  <b>State:</b> {emp.StateName}
+                  </div>
+
+                  <div>
+                  <b>City:</b> {emp.CityName}
+                  </div>
+
+                  <div>
+                  <b>DOB:</b>{" "}
+                  {formatDate(emp.DateOfBirth)}
+                  </div>
+
+                  <div>
+                  <b>DOJ:</b>{" "}
+                  {formatDate(emp.DateOfJoinee)}
+                  </div>
+
+                  <div>
+                  <b>Created:</b>{" "}
+                  {formatDate(emp.CreatedDate)}
+                  </div>
+
+                  <div>
+                  <b>Updated:</b>{" "}
+                  {
+                  emp.UpdatedDate
+                  ? formatDate(emp.UpdatedDate)
+                  : "-"
+                  }
+                  </div>
+
+                  <div>
+                  <b>Deleted:</b>{" "}
+                  {emp.IsDeleted ? "Yes" : "No"}
+                  </div>
+
+                  <div>
+                  <b>Deleted Date:</b>{" "}
+                  {
+                  emp.DeletedDate
+                  ? formatDate(emp.DeletedDate)
+                  : "-"
+                  }
+                  </div>
+
+                  </div>
+
+                  </td>
+                  </tr>
                   )}
 
                 </React.Fragment>

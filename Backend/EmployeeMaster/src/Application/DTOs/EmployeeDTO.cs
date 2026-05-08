@@ -47,5 +47,6 @@ namespace EmployeeMaster.src.Application.DTOs
         public DateTime DateOfBirth { get; set; }
 
         public DateTime? DateOfJoinee { get; set; }
+        public bool IsActive { get; set; }
     }
 }

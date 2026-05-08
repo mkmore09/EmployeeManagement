@@ -116,7 +116,8 @@ namespace EmployeeMaster.src.Infrastructure.Persistence.Repositories
                 new SqlParameter("@ProfileImage", dto.ProfileImage ?? (object)DBNull.Value),
                 new SqlParameter("@Gender", dto.Gender),
                 new SqlParameter("@DateOfBirth", dto.DateOfBirth),
-                new SqlParameter("@DateOfJoinee", dto.DateOfJoinee ?? (object)DBNull.Value)
+                new SqlParameter("@DateOfJoinee", dto.DateOfJoinee ?? (object)DBNull.Value),
+                new SqlParameter("@IsActive",dto.IsActive)
             };
         }
     }

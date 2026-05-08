@@ -2,8 +2,13 @@ import { api } from "./client";
 
 // helper to unwrap response
 const unwrap = async (promise) => {
-  const res = await promise;
-  return res.data;
+  try {
+    const res = await promise;
+    return res.data;
+  } catch (err) {
+    // 🔥 CRITICAL FIX: return backend response even for 400
+    return err.response?.data;
+  }
 };
 
 // LIST

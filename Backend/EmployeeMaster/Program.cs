@@ -42,16 +42,20 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
 {
     options.InvalidModelStateResponseFactory = context =>
     {
-        var errors = context.ModelState
+        var firstError = context.ModelState
             .Where(x => x.Value.Errors.Count > 0)
-            .SelectMany(x => x.Value.Errors)
-            .Select(x => x.ErrorMessage)
-            .ToList();
+            .Select(x => new
+            {
+                Field = char.ToLowerInvariant(x.Key[0]) + x.Key.Substring(1),
+                Message = x.Value.Errors.First().ErrorMessage
+            })
+            .FirstOrDefault();
 
         var response = new
         {
             success = false,
-            message = errors.FirstOrDefault() ?? "Validation failed"
+            field = firstError?.Field,
+            message = firstError?.Message ?? "Validation failed"
         };
 
         return new BadRequestObjectResult(response);

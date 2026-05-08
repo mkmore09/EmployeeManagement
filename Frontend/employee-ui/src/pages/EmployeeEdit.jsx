@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import EmployeeForm from "../components/EmployeeForm";
+import { useNavigate } from "react-router-dom";
 import {
   getEmployeeById,
   updateEmployee
@@ -9,7 +10,7 @@ import {
 export default function EmployeeEdit() {
 
   const { id } = useParams();
-
+  const navigate = useNavigate();
   const [form, setForm] = useState({
     firstName: "",
     lastName: "",
@@ -120,6 +121,7 @@ export default function EmployeeEdit() {
 
       setApiMessage(res.message || "Updated successfully");
       setIsSuccess(true);
+      navigate("/");
 
     } catch (err) {
       setApiMessage(err?.response?.data?.message || "Server error");
